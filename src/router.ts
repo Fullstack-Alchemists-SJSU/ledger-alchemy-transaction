@@ -1,5 +1,5 @@
 import express from 'express';
-import { fetchUserTransaction } from './controllers/v1/transaction_controller';
+import { getUserTransaction, syncUserTransaction } from './controllers/v1/transaction_controller';
 
 const router = (app: express.Express) => {
     const baseApiRouter = express.Router();
@@ -13,8 +13,8 @@ const router = (app: express.Express) => {
     /**
      * Transaction API Routes
      */
-    transactionRouter.post('/fetch_user_transactions', fetchUserTransaction);
-    // transactionRouter.post('/exchange_public_token', exchangePublicToken);
+    transactionRouter.post('/fetch_user_transactions', getUserTransaction);
+    transactionRouter.post('/sync_user_transactions', syncUserTransaction);
 
     v1Router.use('/transaction', transactionRouter);
 

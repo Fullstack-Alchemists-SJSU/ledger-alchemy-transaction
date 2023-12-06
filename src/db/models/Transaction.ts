@@ -1,128 +1,134 @@
 // src/Transaction.ts
-import { DataTypes } from 'sequelize';
-import sequelize from '../db';
+import {DataTypes} from 'sequelize'
+import sequelize from '../db'
 
-const Transaction = sequelize.define('Transaction', {
-    transaction_id: {
-        type: DataTypes.STRING,
-        primaryKey: true,
-    },
-    account_id: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    amount: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-    },
-    date: {
-        type: DataTypes.DATEONLY,
-        allowNull: false,
-    },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-    payment_channel: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    transaction_type: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    category: {
-        type: DataTypes.JSON,
-        allowNull: true,
-    },
-    category_id: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    pending: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-    },
-    transaction_code: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    iso_currency_code: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    unofficial_currency_code: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    merchant_name: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    authorized_date: {
-        type: DataTypes.DATEONLY,
-        allowNull: true,
-    },
-    authorized_datetime: {
-        type: DataTypes.DATE,
-        allowNull: true,
-    },
-    location: {
-        type: DataTypes.JSON,
-        allowNull: true,
-    },
-    payment_meta: {
-        type: DataTypes.JSON,
-        allowNull: true,
-    },
-    personal_finance_category: {
-        type: DataTypes.JSON,
-        allowNull: true,
-    },
-    personal_finance_category_icon_url: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    counterparties: {
-        type: DataTypes.JSON,
-        allowNull: true,
-    },
-    logo_url: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    merchant_entity_id: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    check_number: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    website: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    personal_finance_category_primary: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    personal_finance_category_detailed: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    personal_finance_category_confidence_level: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-}, {
-    timestamps: false,
-    tableName: 'Transactions'
-});
+const Transaction = sequelize.define(
+	'Transaction',
+	{
+		transaction_id: {
+			type: DataTypes.STRING,
+			primaryKey: true,
+		},
+		account_id: {
+			type: DataTypes.STRING,
+			allowNull: false,
+		},
+		amount: {
+			type: DataTypes.DECIMAL(10, 2),
+			allowNull: false,
+		},
+		date: {
+			type: DataTypes.DATEONLY,
+			allowNull: false,
+		},
+		name: {
+			type: DataTypes.STRING,
+			allowNull: false,
+		},
+		payment_channel: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		transaction_type: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		category: {
+			type: DataTypes.JSON,
+			allowNull: true,
+		},
+		category_id: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		pending: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+		},
+		transaction_code: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		iso_currency_code: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		unofficial_currency_code: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		merchant_name: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		authorized_date: {
+			type: DataTypes.DATEONLY,
+			allowNull: true,
+		},
+		authorized_datetime: {
+			type: DataTypes.DATE,
+			allowNull: true,
+		},
+		location: {
+			type: DataTypes.JSON,
+			allowNull: true,
+		},
+		payment_meta: {
+			type: DataTypes.JSON,
+			allowNull: true,
+		},
+		personal_finance_category: {
+			type: DataTypes.JSON,
+			allowNull: true,
+		},
+		personal_finance_category_icon_url: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		counterparties: {
+			type: DataTypes.JSON,
+			allowNull: true,
+		},
+		logo_url: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		merchant_entity_id: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		check_number: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		website: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		personal_finance_category_primary: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		personal_finance_category_detailed: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		personal_finance_category_confidence_level: {
+			type: DataTypes.STRING,
+			allowNull: true,
+		},
+		userSub: {
+			type: DataTypes.STRING,
+			allowNull: false,
+		},
+	},
+	{
+		timestamps: false,
+		tableName: 'Transactions',
+	}
+)
 
-export default Transaction;
-
-
+export default Transaction
 
 // EXAMPLE OF A TRANSACTION
 

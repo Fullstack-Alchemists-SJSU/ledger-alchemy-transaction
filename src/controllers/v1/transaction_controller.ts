@@ -1,41 +1,65 @@
-
-import sequelize from '../../db/db';
 import Transaction from '../../db/models/Transaction';
 import BankAccount from '../../db/models/BankAccount';
 import plaidClient from '../../utils/plaidClient';
-
-sequelize.sync({ alter: true }).then(() => {
-    console.log('Database synchronized');
-});
+import fs from 'fs';
+import path from 'path';
 
 // To fetch and store transactions
 export const getUserTransaction = async (req: any, res: any) => {
-    const { user_id, access_token } = req.body;
+    const { userSub } = req.body;
+    const currentDate = new Date();
+    const threeMonthsAgo = new Date(currentDate.setMonth(currentDate.getMonth() - 3)).toISOString().split('T')[0];
+    const todayDate = new Date().toISOString().split('T')[0];
 
     try {
         const bankAccounts = await BankAccount.findAll({
-            where: { user_id: user_id }
+            where: { user_id: userSub },
+            attributes: ['access_token', 'account_id']
         });
 
+        // Group accounts by access token
+        const accountsByToken = new Map();
         for (const account of bankAccounts) {
+            const accessToken = account.dataValues.access_token;
+            const accountId = account.dataValues.account_id;
+
+            if (!accountsByToken.has(accessToken)) {
+                accountsByToken.set(accessToken, []);
+            }
+            accountsByToken.get(accessToken).push(accountId);
+        }
+
+
+        let allTransactions: any[] = [];
+        for (const [accessToken, accountIds] of accountsByToken.entries()) {
             // Get transactions from Plaid
             const response = await plaidClient.transactionsGet({
-                access_token: access_token,
-                start_date: '2021-01-01', // Dates to be fixed for a month period or to be taken as input from user.
-                end_date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
+                access_token: accessToken,
+                start_date: threeMonthsAgo,
+                end_date: todayDate, // Today's date in YYYY-MM-DD format
                 options: {
-                    account_ids: ['3evnlyMGeWCNEWkv7pNqIW63MKeryBuZvm4KZ', '3evnlyMGeWCNEWkv7pNqIW63MKeryBuZvm4KZ'] //[account.account_id]
+                    account_ids: accountIds,
                 }
             });
 
-            const transactions = response.data.transactions;
-            console.log(transactions);
-
-            // Store each transaction in the database
-            await storeGetTransactions(transactions);
+            allTransactions = allTransactions.concat(response.data.transactions);
         }
 
-        res.send('Transactions fetched and stored successfully.');
+        // Path where the JSON file will be saved
+        const transactionsFilePath = path.join(__dirname, 'transactions.json');
+
+        // Write the transactions to a JSON file
+        fs.writeFile(transactionsFilePath, JSON.stringify(allTransactions, null, 2), 'utf8', (err) => {
+            if (err) {
+                console.error('Error writing transactions to JSON file', err);
+                return res.status(500).send('An error occurred while writing transactions to file');
+            }
+
+            console.log('Transactions successfully written to JSON file');
+        });
+
+        res.json(allTransactions);
+        // res.send('Transactions fetched and stored successfully.');
     } catch (error) {
         console.error('Error fetching transactions:', error);
         res.status(500).send('Internal Server Error');
@@ -43,11 +67,12 @@ export const getUserTransaction = async (req: any, res: any) => {
 };
 
 export const syncUserTransaction = async (req: any, res: any) => {
-    const { user_id, access_token } = req.body;
+    const { userSub } = req.body;
 
     try {
         const bankAccounts = await BankAccount.findAll({
-            where: { user_id: user_id }
+            where: { user_id: userSub },
+            attributes: ['access_token']
         });
 
         for (const account of bankAccounts) {
@@ -56,7 +81,7 @@ export const syncUserTransaction = async (req: any, res: any) => {
 
             while (hasMore) {
                 const response = await plaidClient.transactionsSync({
-                    access_token: access_token,
+                    access_token: account.dataValues.access_token,
                     cursor: cursor,
                     count: 100 // optional, adjust as needed
                 });
@@ -89,7 +114,7 @@ async function storeGetTransactions(transactions: any[]): Promise<void> {
 async function storeSyncTransactions(added: any[], modified: any[], removed: any[]): Promise<void> {
     // Handle added transactions
     for (const trans of added) {
-        await Transaction.create(mapTransactionFields(trans));
+        await Transaction.upsert(mapTransactionFields(trans));
     }
 
     // Handle removed transactions
@@ -138,3 +163,29 @@ function mapTransactionFields(trans: any) {
         counterparties: JSON.stringify(trans.counterparties)
     };
 }
+
+export const readTransactions = async (req: any, res: any) => {
+    const userSub = req.params.userSub;
+    const { accountId } = req.query;
+
+    try {
+        const queryOptions = {
+            where: { user_sub: userSub },
+            order: [['date', 'DESC']], // example of ordering by date
+        };
+
+        // Add optional filters based on query parameters
+        if (accountId) queryOptions.where.user_sub = accountId;
+
+        const transactions = await Transaction.findAll(queryOptions as any);
+
+        if (!transactions) {
+            return res.status(404).json({ message: 'No transactions found.' });
+        }
+
+        res.json(transactions);
+    } catch (error) {
+        console.error('Error fetching transactions:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+};

@@ -1,7 +1,7 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
 
 const configuration = new Configuration({
-    basePath: PlaidEnvironments.sandbox, // or .development or .production
+    basePath: PlaidEnvironments.developement, // or .development or .production
     baseOptions: {
         headers: {
             'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
@@ -9,6 +9,8 @@ const configuration = new Configuration({
         },
     },
 });
+
+console.log("Plaid configuration", configuration);
 
 const plaidClient = new PlaidApi(configuration);
 

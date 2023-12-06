@@ -19,7 +19,7 @@
 		"typescript": "^5.2.2"
 	},
 	"name": "ledger-alchemy-transaction",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"main": "index.js",
 	"scripts": {
 		"start": "nodemon --exec ts-node src/index.ts",
